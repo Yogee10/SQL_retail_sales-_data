@@ -76,7 +76,7 @@ SELECT COUNT (*) AS total_sale FROM Retail_Sales;
 SELECT COUNT (DISTINCT customer_id) AS total_sale FROM Retail_Sales;
 ```
 --**how many unique category we have**
-```
+```sql
 SELECT DISTINCT category FROM Retail_Sales;
 ```
 ### 3. Data Analysis & Findings
