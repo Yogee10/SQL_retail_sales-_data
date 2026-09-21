@@ -65,16 +65,33 @@ WHERE
     gender IS NULL OR age IS NULL OR category IS NULL OR 
     quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
 ```
+--Data exploration
 
+--**how many sales we have**
+```sql
+SELECT COUNT (*) AS total_sale FROM Retail_Sales;
+```
+--**how many unique customers we have**
+```sql
+SELECT COUNT (DISTINCT customer_id) AS total_sale FROM Retail_Sales;
+```
+--**how many unique category we have**
+```
+SELECT DISTINCT category FROM Retail_Sales;
+```
 ### 3. Data Analysis & Findings
+--**convert sale_date into a DATETIME value.**
+```sql
+SELECT CONVERT(DATETIME, sale_date, 120) FROM Retail_Sales;
+```
 
 The following SQL queries were developed to answer specific business questions:
 
 1. **Write a SQL query to retrieve all columns for sales made on '2022-11-05**:
 ```sql
 SELECT *
-FROM retail_sales
-WHERE sale_date = '2022-11-05';
+FROM Retail_Sales
+WHERE sale_date = '2022-11-05'
 ```
 
 2. **Write a SQL query to retrieve all transactions where the category is 'Clothing' and the quantity sold is more than 2 in the month of Nov-2022**:
@@ -113,35 +130,36 @@ WHERE total_sale>1000
 
 6. **Write a SQL query to find the total number of transactions (transaction_id) made by each gender in each category.**:
 ```sql
+SELECT 
 gender,
-  category,
-  COUNT (transactions_id) as Total_transaction
+category,
+COUNT (transactions_id) as Total_transaction
 FROM Retail_Sales
 GROUP BY
-  gender,
-  category
+gender,
+category
 ORDER BY
-  category,
-  gender;
+category,
+gender;
 ```
 
 7. **Write a SQL query to calculate the average sale for each month. Find out best selling month in each year**:
 ```sql
 SELECT 
-  Sale_year,
-  Sale_month,
-  Average_sale
+Sale_year,
+Sale_month,
+Average_sale
 FROM
-  (
-  	SELECT
-      YEAR(sale_date) as Sale_year,
-		  MONTH(sale_date) as Sale_month,
-		  AVG(total_sale) as Average_sale,
-      RANK() OVER(PARTITION BY YEAR(sale_date) ORDER BY AVG(total_sale) DESC) AS Sales_rank
-    FROM Retail_Sales
-    GROUP BY
-      YEAR(sale_date),
-      MONTH(sale_date)
+(
+	SELECT
+		YEAR(sale_date) as Sale_year,
+		MONTH(sale_date) as Sale_month,
+		AVG(total_sale) as Average_sale,
+		RANK() OVER(PARTITION BY YEAR(sale_date) ORDER BY AVG(total_sale) DESC) AS Sales_rank
+	FROM Retail_Sales
+	GROUP BY
+	YEAR(sale_date),
+	MONTH(sale_date)
 ) AS T1
 WHERE Sales_rank=1
 ```
@@ -176,22 +194,21 @@ ORDER BY category, customer_id;
 
 11. **Write a SQL query to create each shift and number of orders (Example Morning <12, Afternoon Between 12 & 17, Evening >17)**:
 ```sql
-WITH hourly_sale
+WITH Hourly_sale
 AS
-(
-SELECT *,
+(SELECT *,
     CASE
-        WHEN EXTRACT(HOUR FROM sale_time) < 12 THEN 'Morning'
-        WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
+        WHEN DATEPART(HOUR, sale_time) < 12 THEN 'Morning'
+        WHEN DATEPART(HOUR, sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
         ELSE 'Evening'
-    END as shift
-FROM retail_sales
-)
+    END AS Shift
+FROM Retail_Sales)
+
 SELECT 
-    shift,
-    COUNT(*) as total_orders    
-FROM hourly_sale
-GROUP BY shift
+Shift,
+COUNT(transactions_id)AS Total_sales
+FROM Hourly_sale
+GROUP BY Shift
 ```
 
 ## Findings
